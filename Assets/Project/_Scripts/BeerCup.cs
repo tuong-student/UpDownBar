@@ -5,8 +5,11 @@ using UnityEngine;
 public class BeerCup : MonoBehaviour
 {
     private string PUNISH_TAG = "PunishCollider";
-    private Customer _customer;
 
+    void Awake()
+    {
+        GameplayManager.Instance.OnEndDay += OnEndDayHandler;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.CompareTag(PUNISH_TAG))
@@ -15,8 +18,13 @@ public class BeerCup : MonoBehaviour
             BeerServeManager.Instance.OnServerFail?.Invoke();            
         }
     }
-    public void SetCustomer(Customer customer)
+    void OnDisable()
     {
-        _customer = customer;
+        GameplayManager.Instance.OnEndDay -= OnEndDayHandler;
+    }
+
+    private void OnEndDayHandler()
+    {
+        Destroy(this.gameObject);
     }
 }

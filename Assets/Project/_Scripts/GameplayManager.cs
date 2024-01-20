@@ -1,21 +1,22 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using NOOD;
 using UnityEngine;
 
 public class GameplayManager : MonoBehaviorInstance<GameplayManager>
 {
     public Action OnEndDay;
+    public Action OnNextDay;
     public bool IsEndDay;
 
     void OnEnable()
     {
         TimeManager.Instance.OnTimeUp += OnTimeUpHandler;
+        UIManager.Instance.OnNextDayPressed += OnNextDayPressHandler;
     }
     void OnDisable()
     {
         TimeManager.Instance.OnTimeUp -= OnTimeUpHandler;
+        UIManager.Instance.OnNextDayPressed -= OnNextDayPressHandler;
     }
 
     #region Event functions
@@ -23,6 +24,11 @@ public class GameplayManager : MonoBehaviorInstance<GameplayManager>
     {
         IsEndDay = true;
         OnEndDay?.Invoke();
+    }
+    private void OnNextDayPressHandler()
+    {
+        IsEndDay = false;
+        OnNextDay?.Invoke();
     }
     #endregion
 }

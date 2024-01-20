@@ -1,11 +1,16 @@
+using System;
 using NOOD;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviorInstance<UIManager>
 {
+    #region Events
+    public Action OnStorePhase;
+    public Action OnNextDayPressed;
+    #endregion
+
     [Header("In game menu")]
     [SerializeField] private TextMeshProUGUI _moneyText;
     [SerializeField] private TextMeshProUGUI _timeText;
@@ -14,16 +19,27 @@ public class UIManager : MonoBehaviorInstance<UIManager>
     [SerializeField] private GameObject _endDayPanel;
     [SerializeField] private TextMeshProUGUI _money;
     [SerializeField] private Button _shopBtn, _nextDayBtn;
-    [SerializeField] private float _timeIncreaseSpeed = 5;
+    [SerializeField] private float _timeIncreaseSpeed = 30;
+    [Header("Store")]
+    [SerializeField] private Button _confirmButton;
 
     #region Unity functions
     void Awake()
     {
         _endDayPanel.SetActive(false);
+        _shopBtn.onClick.AddListener(ActiveStorePhrase);
+        _confirmButton.onClick.AddListener(() => 
+        {
+            OpenEndDayPanel();
+            _confirmButton.gameObject.SetActive(false);
+        });
+        _nextDayBtn.onClick.AddListener(() => OnNextDayPressed?.Invoke());
+        _confirmButton.gameObject.SetActive(false);
     }
     void OnEnable()
     {
         GameplayManager.Instance.OnEndDay += OnEndDayHandler;
+        OnNextDayPressed += HideEndDayPanel;
     }
     private void Start()
     {
@@ -32,6 +48,10 @@ public class UIManager : MonoBehaviorInstance<UIManager>
         TimeManager.Instance.OnTimeWarning += () => 
         { 
             _timeBG.color = Color.red; 
+        };
+        GameplayManager.Instance.OnNextDay += () =>
+        {
+            _timeBG.color = Color.white;
         };
     }
     private void Update()
@@ -42,6 +62,7 @@ public class UIManager : MonoBehaviorInstance<UIManager>
     void OnDisable()
     {
         GameplayManager.Instance.OnEndDay -= OnEndDayHandler;
+        OnNextDayPressed -= HideEndDayPanel;
     }
     #endregion
 
@@ -63,11 +84,15 @@ public class UIManager : MonoBehaviorInstance<UIManager>
     private void OnEndDayHandler()
     {
         OpenEndDayPanel();
+        PlayMoneyAnimation(MoneyManager.Instance.GetMoney());
     }
     private void OpenEndDayPanel()
     {
         _endDayPanel.SetActive(true);
-        PlayMoneyAnimation(MoneyManager.Instance.GetMoney());
+    }
+    private void HideEndDayPanel()
+    {
+        _endDayPanel.SetActive(false);
     }
     private void PlayMoneyAnimation(int money)
     {
@@ -78,6 +103,12 @@ public class UIManager : MonoBehaviorInstance<UIManager>
             _money.text = temp.ToString("0");
             return temp > money;
         });
+    }
+    private void ActiveStorePhrase()
+    {
+        HideEndDayPanel();
+        _confirmButton.gameObject.SetActive(true);
+        OnStorePhase?.Invoke();
     }
     #endregion
 }

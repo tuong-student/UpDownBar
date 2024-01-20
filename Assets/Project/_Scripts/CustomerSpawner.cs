@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class CustomerSpawner : MonoBehaviorInstance<CustomerSpawner>
 {
-    [SerializeField] private List<Table> _tableList = new List<Table>();
     [SerializeField] private Transform _customerPref;
     [SerializeField] private float _spawnTime;
 
@@ -21,7 +20,7 @@ public class CustomerSpawner : MonoBehaviorInstance<CustomerSpawner>
         {
             yield return new WaitForSeconds(_spawnTime);
 
-            List<Table> availableTable = _tableList.Where(table => table.IsAvailable() == true).ToList();
+            List<Table> availableTable = TableManager.Instance.GetTableList().Where(table => table.IsAvailable() == true).ToList();
             if (availableTable != null && availableTable.Count > 0 && GameplayManager.Instance.IsEndDay == false)
             {
                 Customer customer = Instantiate(_customerPref, this.transform.position, Quaternion.identity).GetComponent<Customer>();

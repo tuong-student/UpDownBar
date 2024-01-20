@@ -51,9 +51,9 @@ public class Customer : MonoBehaviour
         {
             Vector3 direction = _targetSeat - this.transform.position;
             direction = Vector3.Normalize(direction);
-            this.transform.position += direction * _speed * Time.deltaTime;
+            this.transform.position += direction * _speed * TimeManager.UnScaledDeltaTime;
             this.transform.DOKill(); // To stop rotate
-            this.transform.forward = Vector3.Lerp(this.transform.forward, direction, Time.deltaTime * _rotateSpeed);
+            this.transform.forward = Vector3.Lerp(this.transform.forward, direction, TimeManager.UnScaledDeltaTime* _rotateSpeed);
         }
         else
         {
@@ -74,8 +74,8 @@ public class Customer : MonoBehaviour
     public void Complete()
     {
         _isServed = true;
-        TableManager.Instance.CustomerComplete(this);
-        SetTargetPosition(CustomerSpawner.Instance.transform.position);
+        TableManager.Instance.CustomerComplete(this); // Return seat
+        SetTargetPosition(CustomerSpawner.Instance.transform.position); // Move out
         Destroy(this.gameObject, 4f);
         // Pay money
         MoneyManager.Instance.AddMoney(_money);
@@ -83,7 +83,8 @@ public class Customer : MonoBehaviour
     private void Return()
     {
         _isServed = true;
-        SetTargetPosition(CustomerSpawner.Instance.transform.position);
+        TableManager.Instance.CustomerComplete(this); // Return seat
+        SetTargetPosition(CustomerSpawner.Instance.transform.position); // Move out
         Destroy(this.gameObject, 2f);
     }
 }

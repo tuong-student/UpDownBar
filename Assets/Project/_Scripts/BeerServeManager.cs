@@ -52,7 +52,7 @@ public class BeerServeManager : MonoBehaviorInstance<BeerServeManager>
         {
             if (beerCup == null) return true;
 
-            beerCup.transform.position += Vector3.left * moveSpeed * Time.deltaTime;
+            beerCup.transform.position += Vector3.left * moveSpeed * TimeManager.DeltaTime;
             return false;
         });
     }

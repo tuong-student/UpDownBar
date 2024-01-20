@@ -1,25 +1,32 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class Table : MonoBehaviour
 {
     [SerializeField] private List<Transform> _seatList = new List<Transform>();
+    private Queue<Transform> _lockSeatList = new Queue<Transform>();
     private Dictionary<Customer, Transform> _unAvailableSeat = new Dictionary<Customer, Transform>();
-    private Queue<Vector3> _servePositionQueue = new Queue<Vector3>();
-    private float _tableHeight = 0.85f;
 
     private void Start()
     {
         TableManager.Instance.OnCustomComplete += OnCustomerCompleteHandler;
-        TableManager.Instance.OnCustomerRequestBeer += OnCustomerRequestBeerHandler;
+        while(_seatList.Count > 1)
+        {
+            Transform seat = _seatList[1];
+            _lockSeatList.Enqueue(seat);
+            _seatList.Remove(seat);
+        }
     }
     private void OnDestroy()
     {
         TableManager.Instance.OnCustomComplete -= OnCustomerCompleteHandler;
-        TableManager.Instance.OnCustomerRequestBeer -= OnCustomerRequestBeerHandler;
     }
-
+    
+    public void UnlockSeat()
+    {
+        Transform seat = _lockSeatList.Dequeue();
+        _seatList.Add(seat);
+    }
     public void OnCustomerCompleteHandler(Customer customer)
     {
         if(_unAvailableSeat.ContainsKey(customer))
@@ -28,29 +35,6 @@ public class Table : MonoBehaviour
             _unAvailableSeat.Remove(customer);
         }
     }
-    public void OnCustomerRequestBeerHandler(Customer customer)
-    {
-        if(_unAvailableSeat.ContainsKey(customer))
-        {
-            Vector3 servePosition = new Vector3(customer.transform.position.x, _tableHeight, this.transform.position.z);
-            _servePositionQueue.Enqueue(servePosition);
-            Debug.Log("Custom request: " + servePosition);
-        }
-    }
-    public bool GetServePosition(out Vector3 position)
-    {
-        if(_servePositionQueue.Count > 0)
-        {
-            position = _servePositionQueue.Dequeue();
-            return true;
-        }
-        else
-        {
-            position = Vector3.zero;
-            return false;
-        }
-    }
-
     public bool IsAvailable()
     {
         return _seatList.Count > 0;

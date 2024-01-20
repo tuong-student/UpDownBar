@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using NOOD;
 using UnityEngine;
 
-public class CustomerSpawner : MonoBehaviour
+public class CustomerSpawner : MonoBehaviorInstance<CustomerSpawner>
 {
     [SerializeField] private List<Table> _tableList = new List<Table>();
     [SerializeField] private Transform _customerPref;
@@ -21,7 +22,7 @@ public class CustomerSpawner : MonoBehaviour
             yield return new WaitForSeconds(_spawnTime);
 
             List<Table> availableTable = _tableList.Where(table => table.IsAvailable() == true).ToList();
-            if (availableTable != null && availableTable.Count > 0)
+            if (availableTable != null && availableTable.Count > 0 && GameplayManager.Instance.IsEndDay == false)
             {
                 Customer customer = Instantiate(_customerPref, this.transform.position, Quaternion.identity).GetComponent<Customer>();
 
@@ -29,7 +30,7 @@ public class CustomerSpawner : MonoBehaviour
                 int r = Random.Range(0, availableTable.Count - 1);
                 Transform seat = availableTable[r].GetSeatForCustomer(customer);
                 // Check if seat valid
-                customer.SetTargetSeat(seat.position);
+                customer.SetTargetPosition(seat.position);
             }
         }
     }

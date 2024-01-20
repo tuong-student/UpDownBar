@@ -19,7 +19,6 @@ public class Player : MonoBehaviorInstance<Player>
     {
         _input = GetInput();
         CalculateStandIndex();
-        Debug.Log("tableIndex " + _index);
 
         Vector3 standPosition = new Vector3(this.transform.position.x, 0, TableManager.Instance.GetPlayerTablePosition().z);
         this.transform.position = standPosition;
@@ -35,12 +34,12 @@ public class Player : MonoBehaviorInstance<Player>
         if(_input.y > 0)
         {
             // Move up
-            _index--;
+            _index++;
         }
         if(_input.y < 0)
         {
             // Move down
-            _index++;
+            _index--;
         }
         _index = Mathf.Clamp(_index, 0, TableManager.Instance.GetTableList().Count - 1);
         OnPlayerChangePosition?.Invoke(_index);

@@ -1,18 +1,22 @@
 using System;
 
-public class UpgradeAction
+namespace Game
 {
-    public Action OnComplete;
-    private Action _action;
-    
-    public UpgradeAction(Action action)
+    public class UpgradeAction
     {
-        _action = action;
+        public Action OnComplete;
+        private Action _action;
+        
+        public UpgradeAction(Action action)
+        {
+            _action = action;
+        }
+
+        public void Invoke()
+        {
+            _action?.Invoke();
+            OnComplete?.Invoke();
+        }
     }
 
-    public void Invoke()
-    {
-        _action?.Invoke();
-        OnComplete?.Invoke();
-    }
 }

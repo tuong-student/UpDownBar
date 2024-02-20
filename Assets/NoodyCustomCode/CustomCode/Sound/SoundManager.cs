@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -71,7 +72,12 @@ namespace NOOD.Sound
                 enableSoundPlayers = new List<SoundPlayer>();
                 GlobalMusicVolume = 1;
                 GlobalSoundVolume = 1;
+                FindSoundData();
             }
+        }
+        public static void InitSoundManager()
+        {
+            InitIfNeed();
         }
 #endregion
 
@@ -81,7 +87,7 @@ namespace NOOD.Sound
         /// </summary>
         /// <param name="soundEnum"></param>
         /// <param name="volume"></param>
-        public static void PlaySound(SoundEnum soundEnum, float volume = 1)
+        public static void PlaySound(SoundEnum soundEnum, Vector3 position, float volume = 1)
         {
             InitIfNeed();
             if(soundData == null)
@@ -110,22 +116,27 @@ namespace NOOD.Sound
             }
             AudioClip audioClip = soundData.soundDic.Dictionary[soundEnum.ToString()];
 
+            soundPlayer.transform.position = position;
             soundAudioPayer.playOnAwake = false;
             soundAudioPayer.volume = volume;
             soundAudioPayer.clip = audioClip;
             soundAudioPayer.Play();
+            Fade(soundAudioPayer, audioClip.length * 0.2f, 1); // Fade time = 20% of sound length
             enableSoundPlayers.Add(soundPlayer);
 
-            // Add to list when disable
+            // Add to list when end sound
             NoodyCustomCode.StartDelayFunction(() =>
             {
                 if(soundAudioPayer != null)
                 {
-                    soundAudioPayer.gameObject.SetActive(false);
-                    enableSoundPlayers.Remove(soundPlayer);
-                    disableSoundPlayers.Add(soundPlayer);
+                    Fade(soundAudioPayer, audioClip.length * 0.2f, 0, onComplete: () =>
+                    {
+                        soundAudioPayer.gameObject.SetActive(false);
+                        enableSoundPlayers.Remove(soundPlayer);
+                        disableSoundPlayers.Add(soundPlayer);
+                    });
                 }
-            }, audioClip.length);
+            }, audioClip.length - (audioClip.length * 0.2f)); // Start delay function after 80% time
         }
         /// <summary>
         /// Play sound with globalSoundVolume
@@ -133,7 +144,11 @@ namespace NOOD.Sound
         /// <param name="soundEnum"></param>
         public static void PlaySound(SoundEnum soundEnum)
         {
-            PlaySound(soundEnum, GlobalSoundVolume);
+            PlaySound(soundEnum, Vector3.zero, GlobalSoundVolume);
+        }
+        public static void PlaySound(SoundEnum soundEnum, Vector3 position)
+        {
+            PlaySound(soundEnum, position, GlobalSoundVolume);
         }
         /// <summary>
         /// Stop all soundPlayers has the same soundEnum
@@ -152,9 +167,13 @@ namespace NOOD.Sound
             {
                 if(soundPlayer.isActiveAndEnabled)
                 {
-                    soundPlayer.gameObject.SetActive(false);
-                    enableSoundPlayers.Remove(soundPlayer);
-                    disableSoundPlayers.Add(soundPlayer);
+                    AudioSource soundAudioPlayer = soundPlayer.GetComponent<AudioSource>();
+                    Fade(soundAudioPlayer, 0.2f, 0, onComplete: () =>
+                    {
+                        soundPlayer.gameObject.SetActive(false);
+                        enableSoundPlayers.Remove(soundPlayer);
+                        disableSoundPlayers.Add(soundPlayer);
+                    });
                 }
             }
         }
@@ -237,6 +256,7 @@ namespace NOOD.Sound
             musicAudioSource.clip = audioClip;
             musicAudioSource.loop = true;
             musicAudioSource.Play();
+            Fade(musicAudioSource, 0.5f, 1);
         }
         /// <summary>
         /// Play music with globalMusicVolume
@@ -283,8 +303,12 @@ namespace NOOD.Sound
             {
                 musicPlayer = enableMusicPlayers.First(x => x.musicType == sourceMusicEnum);
                 musicAudioSource = musicPlayer.GetComponent<AudioSource>();
-                musicPlayer.musicType = toMusicEnum;
-                musicAudioSource.clip = soundData.musicDic.Dictionary[toMusicEnum.ToString()];
+                Fade(musicAudioSource, 0.2f, 0, onComplete: () =>
+                {
+                    musicPlayer.musicType = toMusicEnum;
+                    musicAudioSource.clip = soundData.musicDic.Dictionary[toMusicEnum.ToString()];
+                    Fade(musicAudioSource, 0.2f, 1);
+                });
             }
             else
             {
@@ -310,10 +334,14 @@ namespace NOOD.Sound
             {
                 MusicPlayer musicPlayer =  enableMusicPlayers.First(x => x.musicType == musicEnum);
 
-                musicPlayer.GetComponent<AudioSource>().Stop();
-                musicPlayer.gameObject.SetActive(false);
-                enableMusicPlayers.Remove(musicPlayer);
-                disableMusicPlayers.Add(musicPlayer);
+                AudioSource musicAudioSource = musicPlayer.GetComponent<AudioSource>();
+                Fade(musicAudioSource, 0.5f, 0, onComplete: () =>
+                {
+                    musicAudioSource.Stop();
+                    musicPlayer.gameObject.SetActive(false);
+                    enableMusicPlayers.Remove(musicPlayer);
+                    disableMusicPlayers.Add(musicPlayer);
+                });
             } 
         }
         /// <summary>
@@ -329,9 +357,9 @@ namespace NOOD.Sound
 
                 musicPlayer.gameObject.SetActive(true);
                 musicPlayer.TryGetComponent<AudioSource>(out AudioSource audioSource);
-                audioSource.Play();
-                audioSource.volume = GlobalMusicVolume;
 
+                audioSource.Play();
+                Fade(audioSource, 0.5f, GlobalMusicVolume);
                 enableMusicPlayers.Add(musicPlayer);
                 disableMusicPlayers.Remove(musicPlayer);
             } 
@@ -380,6 +408,31 @@ namespace NOOD.Sound
 #endregion
 
 #region Support functions
+        /// <summary>
+        /// Fade in or out base on target volume
+        /// </summary>
+        /// <param name="audioSource"></param>
+        /// <param name="duration"></param>
+        /// <param name="targetVolume"></param>
+        public static void Fade(AudioSource audioSource, float duration, float targetVolume, Action onComplete = null)
+        {
+            float currentTime = 0;
+            float start = audioSource.volume;
+            NoodyCustomCode.StartUpdater(audioSource, () =>
+            {
+                if (currentTime < duration)
+                {
+                    currentTime += Time.deltaTime;
+                    audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
+                    return false;
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                    return true;
+                }
+            });
+        }
         /// <summary>
         /// Get music length (data from SoundData)
         /// </summary>

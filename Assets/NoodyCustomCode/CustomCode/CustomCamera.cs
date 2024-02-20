@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using NOOD.NoodCustomEditor;
 using UnityEngine;
 
 namespace NOOD.NoodCamera 
@@ -7,10 +6,14 @@ namespace NOOD.NoodCamera
     public class CustomCamera : MonoBehaviorInstance<CustomCamera>
     {
         #region Components
+        [Header("Tool tip") ,ShowOnly]
+        [SerializeField] string TOOL_TIP = "Press T to test";
         #endregion
 
         #region Stats
-        [SerializeField] float duration = 0.2f, magnitude = 0.02f;
+        [Header("Stats")]
+        [SerializeField] float duration = 0.2f;
+        [SerializeField] float magnitude = 0.02f;
         [SerializeField] float explodeMagnitude = 0.1f;
         [SerializeField] float smoothTime = 2;
         [SerializeField] string targetTag = "Player";
@@ -34,7 +37,7 @@ namespace NOOD.NoodCamera
         {
             if (isShake) Shake();
             if (isHeavyShake) HeaveShake();
-            if(Input.GetKeyDown(KeyCode.U))
+            if(Input.GetKeyDown(KeyCode.T))
             {
                 Shake();
 	        }

@@ -1,3 +1,4 @@
+using NOOD;
 using UnityEditor;
 using UnityEngine;
 
@@ -31,9 +32,8 @@ namespace Game
         protected void OnDisable()
         {
             _upgradeUI.OnUpgradeButtonClick -= OnUpgradeButtonClickHandler;
-            GameplayManager.Instance.OnNextDay -= HideUI;
-            UIManager.Instance.OnStorePhase -= ShowUI;
-            UIManager.Instance.OnStorePhase -= OnStorePhaseHandler;
+            NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
             ChildOnDisable();
         }
         protected virtual void ChildOnDisable(){}

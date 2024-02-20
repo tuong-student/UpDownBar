@@ -9,6 +9,8 @@ namespace Game
     public class Player : MonoBehaviorInstance<Player>
     {
         public static Action<int> OnPlayerChangePosition;
+        public static Action OnPlayerChangePositionSuccess;
+        public static Action OnPlayerPressDeliverBeer;
         private int _index = 0;
         private Vector2 _input;
 
@@ -28,11 +30,13 @@ namespace Game
             if(Input.GetKeyDown(KeyCode.Space))
             {
                 BeerServeManager.Instance.ServeBeer();
+                OnPlayerPressDeliverBeer?.Invoke();
             }
         }
 
         private int CalculateStandIndex()
         {
+            int oldIndex = _index;
             if(_input.y > 0)
             {
                 // Move up
@@ -45,6 +49,10 @@ namespace Game
             }
             _index = Mathf.Clamp(_index, 0, TableManager.Instance.GetTableList().Count - 1);
             OnPlayerChangePosition?.Invoke(_index);
+            if(oldIndex != _index)
+            {
+                OnPlayerChangePositionSuccess?.Invoke();
+            }
             return _index;
         }
 

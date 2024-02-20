@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Extension;
+using NOOD;
 
 namespace Game
 {
@@ -16,6 +17,7 @@ namespace Game
             while(_availableSeats.Count > 1)
             {
                 Transform seat = _availableSeats[1];
+                seat.gameObject.SetActive(false);
                 _lockSeatList.Enqueue(seat);
                 _availableSeats.Remove(seat);
             }
@@ -26,9 +28,9 @@ namespace Game
         }
         private void OnDestroy()
         {
-            TableManager.Instance.OnCustomComplete -= OnCustomerCompleteHandler;
-            GameplayManager.Instance.OnNextDay -= GameStart;
-            UIManager.Instance.OnStorePhase -= OnStorePhaseHandler;
+            NoodyCustomCode.UnSubscribeAllEvent<TableManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
         }
         #endregion
 
@@ -54,6 +56,7 @@ namespace Game
         public void UnlockSeat()
         {
             Transform seat = _lockSeatList.Dequeue();
+            seat.gameObject.SetActive(true);
             _availableSeats.Add(seat);
         }
         public void OnCustomerCompleteHandler(Customer customer)

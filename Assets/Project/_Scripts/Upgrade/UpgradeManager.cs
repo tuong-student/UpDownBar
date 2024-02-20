@@ -26,7 +26,10 @@ namespace Game
                 }
             }
             else
-                Debug.Log("Do not enough money");
+            {
+                NotifyManager.Instance.Show("Do not enough money");
+                // Debug.Log("Do not enough money");
+            }
         }
 
         

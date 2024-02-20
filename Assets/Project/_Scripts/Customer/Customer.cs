@@ -1,4 +1,7 @@
+using System;
 using DG.Tweening;
+using NOOD;
+using NOOD.Sound;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -7,12 +10,26 @@ namespace Game
 
     public class Customer : MonoBehaviour
     {
+        #region Events
+        public Action OnCustomerEnterSeat;
+        public Action OnCustomerReturn;
+        #endregion
+
+        [Header("Waiting time")]
+        [SerializeField] private WaitingUI _waitingUI;
+        [SerializeField] private float _maxWaitingTime;
+        [SerializeField] private float _waitLossSpeed = 1f;
+
+        private float _waitTimer = 0;
+        private bool _isWaiting;
+
         [SerializeField] private int _money = 5;
         private Vector3 _targetSeat;
         private float _speed = 4f;
         private float _rotateSpeed = 10;
         private bool _isRequestBeer;
         private bool _isServed;
+        private bool _isReturnCalled;
 
         #region Unity functions
         void OnEnable()
@@ -21,14 +38,19 @@ namespace Game
         }
         void OnDisable()
         {
-            GameplayManager.Instance.OnEndDay -= OnEndDayHandler;
+            NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
         }
         void Start()
         {
+            _isReturnCalled = false;
         }
         private void Update()
         {
             Move();    
+            if(_isWaiting)
+            {
+                UpdateWaitTimer();
+            }
         }
         private void OnTriggerEnter(Collider other)
         {
@@ -60,13 +82,27 @@ namespace Game
             }
             else
             {
-                this.transform.DORotate(Vector3.zero, 0.5f); 
                 // Get to seat
                 if(!_isRequestBeer)
                 {
+                    this.transform.DORotate(Vector3.zero, 0.5f); 
                     TableManager.Instance.RequestBeer(this);
+                    OnCustomerEnterSeat?.Invoke();
                     _isRequestBeer = true;
+                    _isWaiting = true;
                 }
+            }
+        }
+        private void UpdateWaitTimer()
+        {
+            if(_isWaiting)
+            {
+                _waitTimer += Time.deltaTime * _waitLossSpeed;
+                _waitingUI.UpdateWaitingUI(_waitTimer / _maxWaitingTime);        
+            }
+            if(_waitTimer >= _maxWaitingTime)
+            {
+                Return(); // Return and no money
             }
         }
         public void SetTargetPosition(Vector3 position)
@@ -76,19 +112,32 @@ namespace Game
 
         public void Complete()
         {
-            _isServed = true;
-            TableManager.Instance.CustomerComplete(this); // Return seat
-            SetTargetPosition(CustomerSpawner.Instance.transform.position); // Move out
-            Destroy(this.gameObject, 4f);
+            Return();
             // Pay money
+            TextPopup.Show("+" + _money, this.transform.position, Color.yellow);
             MoneyManager.Instance.AddMoney(_money);
+            BeerServeManager.Instance.OnServeComplete?.Invoke(this);
+            _isWaiting = false;
         }
         private void Return()
         {
+            if (_isReturnCalled == true) return;
+
+            _isReturnCalled = true;
             _isServed = true;
             TableManager.Instance.CustomerComplete(this); // Return seat
             SetTargetPosition(CustomerSpawner.Instance.transform.position); // Move out
-            Destroy(this.gameObject, 2f);
+            OnCustomerReturn?.Invoke();
+            NoodyCustomCode.StartUpdater(this.gameObject, () =>
+            {
+                float distance = Vector3.Distance(this.transform.position, _targetSeat);
+                if (distance <= 0.1f)
+                {
+                    Destroy(this.gameObject);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 }

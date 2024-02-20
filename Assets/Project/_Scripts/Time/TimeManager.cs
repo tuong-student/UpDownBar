@@ -1,5 +1,6 @@
 using System;
 using NOOD;
+using NOOD.Sound;
 using UnityEngine;
 
 namespace Game
@@ -25,6 +26,7 @@ namespace Game
         #region Private
         private float _hour;
         private float _minute;
+        private bool _isWarned, _isTimeUp;
         #endregion
 
         #region Unity functions
@@ -45,13 +47,19 @@ namespace Game
             if(_hour == _hourInLevel)
             {
                 // Warning
-                OnTimeWarning?.Invoke();
+                if(_isWarned == false)
+                    Warning();
             }
             if(_hour == _hourInLevel + 1 && GameplayManager.Instance.IsEndDay == false)
             {
                 // Stop level
-                OnTimeUp?.Invoke();
-                TimeScale = 0;
+                if(_isTimeUp == false)
+                {
+                    OnTimeUp?.Invoke();
+                    TimeScale = 0;
+                    _isTimeUp = true;
+                    SoundManager.PlaySound(SoundEnum.EndLevel);
+                }
             }
         }
         void OnDisable()
@@ -69,6 +77,14 @@ namespace Game
         {
             _hour = 0;
             _minute = 0;
+            _isTimeUp = false;
+            _isWarned = false;
+        }
+        private void Warning()
+        {
+            OnTimeWarning?.Invoke();
+            SoundManager.PlaySound(SoundEnum.Timer);
+            _isWarned = true;
         }
 
         public float GetHour() => _hour;

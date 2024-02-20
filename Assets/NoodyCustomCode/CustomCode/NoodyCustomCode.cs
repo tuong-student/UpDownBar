@@ -9,10 +9,11 @@ using TMPro;
 using ImpossibleOdds;
 using System.Linq;
 using System.Resources;
+using System.Runtime.CompilerServices;
 
 namespace NOOD
 {
-    public class NoodyCustomCode : MonoBehaviorInstance<NoodyCustomCode>
+    public static class NoodyCustomCode
     {
         public static Thread newThread;
 
@@ -211,12 +212,12 @@ namespace NOOD
         {
             Bounds bound = new Bounds(); //Create bound with center Vector3.zero;
 
-            foreach (Collider2D col in FindObjectsOfType<Collider2D>())
+            foreach (Collider2D col in UnityEngine.Object.FindObjectsOfType<Collider2D>())
             {
                 bound.Encapsulate(col.bounds);
             }
 
-            foreach (Collider col in FindObjectsOfType<Collider>())
+            foreach (Collider col in UnityEngine.Object.FindObjectsOfType<Collider>())
             {
                 bound.Encapsulate(col.bounds);
             }
@@ -458,6 +459,23 @@ namespace NOOD
         {
             return ColorUtility.ToHtmlStringRGB(color);
         }
+        //----------------------------//
+        public static void FadeCanvasGroup(this object source, CanvasGroup canvasGroup, float endValue, float speed)
+        {
+            StartUpdater(source, () =>
+            {
+                if (Mathf.Abs(canvasGroup.alpha - endValue) > 0.01f)
+                {
+                    if(canvasGroup.alpha < endValue)
+                        canvasGroup.alpha += Time.deltaTime * speed;
+                    if (canvasGroup.alpha > endValue)
+                        canvasGroup.alpha -= Time.deltaTime * speed;
+                    return true;
+                }
+                return false;
+            });
+        }
+        
         //----------------------------//
         /// <summary>
         /// reduce alpha to 0 over Time.deltaTime
@@ -730,29 +748,29 @@ namespace NOOD
         #endregion
 
         #region Update Functions
-        public static void StartUpdater(Action action)
+        public static void StartUpdater(object target, Action action)
         {
-            UpdateObject.Create(() => {action?.Invoke(); return false;}, "", false);
+            UpdateObject.Create(target, () => {action?.Invoke(); return false;}, "", false);
         }
-        public static void StartUpdater(Action action, string functionName)
+        public static void StartUpdater(object target, Action action, string functionName)
         {
-            UpdateObject.Create(() => {action?.Invoke(); return false;}, functionName, false);
+            UpdateObject.Create(target, () => {action?.Invoke(); return false;}, functionName, false);
         }
-        public static void StartUpdater(Action action, string functionName, bool stopAllWithTheSameName)
+        public static void StartUpdater(object target, Action action, string functionName, bool stopAllWithTheSameName)
         {
-            UpdateObject.Create(() => {action?.Invoke(); return false;}, functionName, stopAllWithTheSameName);
+            UpdateObject.Create(target, () => {action?.Invoke(); return false;}, functionName, stopAllWithTheSameName);
         }
-        public static void StartUpdater(Func<bool> func)
+        public static UpdateObject StartUpdater(object target, Func<bool> func)
         {
-            UpdateObject.Create(func, "", false);
+            return UpdateObject.Create(target, func, "", false);
         }
-        public static void StartUpdater(Func<bool> func, string functionName)
+        public static UpdateObject StartUpdater(object target, Func<bool> func, string functionName)
         {
-            UpdateObject.Create(func, functionName, false);
+            return UpdateObject.Create(target, func, functionName, false);
         }
-        public static void StartUpdater(Func<bool> func, string functionName, bool stopAllWithTheSameName)
+        public static void StartUpdater(object target, Func<bool> func, string functionName, bool stopAllWithTheSameName)
         {
-            UpdateObject.Create(func, functionName, stopAllWithTheSameName);
+            UpdateObject.Create(target, func, functionName, stopAllWithTheSameName);
         }
         public static void StopUpdaterWithName(string functionName)
         {

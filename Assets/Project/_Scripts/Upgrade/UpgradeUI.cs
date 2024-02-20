@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Game
 {
@@ -12,13 +11,12 @@ namespace Game
         public Action OnUpgradeButtonClick;
 
         [SerializeField] private TextMeshProUGUI _moneyText;
-        [SerializeField] private Button _upgradeButton;
+        [SerializeField] private CustomButton _upgradeButton;
         private UpgradeBase _upgradeBase;
-
-        void Awake()
+        
+        void Start()
         {
-            _upgradeButton = GetComponent<Button>();
-            _upgradeButton.onClick.AddListener(() => OnUpgradeButtonClick?.Invoke());
+            _upgradeButton.OnClick += () => OnUpgradeButtonClick?.Invoke();
         }
         void OnEnable()
         {

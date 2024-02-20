@@ -1,5 +1,6 @@
 using System;
 using NOOD;
+using NOOD.Sound;
 using UnityEngine;
 
 namespace Game
@@ -14,11 +15,17 @@ namespace Game
         {
             TimeManager.Instance.OnTimeUp += OnTimeUpHandler;
             UIManager.Instance.OnNextDayPressed += OnNextDayPressHandler;
+            SoundManager.InitSoundManager();
         }
         void OnDisable()
         {
-            TimeManager.Instance.OnTimeUp -= OnTimeUpHandler;
-            UIManager.Instance.OnNextDayPressed -= OnNextDayPressHandler;
+            NoodyCustomCode.UnSubscribeAllEvent<TimeManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
+        }
+        void Start()
+        {
+            SoundManager.PlayMusic(MusicEnum.PianoBGMusic);
+            SoundManager.PlayMusic(MusicEnum.CrowdBGSound);
         }
 
         #region Event functions

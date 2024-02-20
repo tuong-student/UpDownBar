@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using NOOD;
+using NOOD.NoodCamera;
+using NOOD.Sound;
 using UnityEngine;
 
 namespace Game
@@ -10,7 +12,8 @@ namespace Game
 
     public class BeerServeManager : MonoBehaviorInstance<BeerServeManager>
     {
-        public Action OnServerFail;
+        public Action<Vector3> OnServerFail;
+        public Action<Customer> OnServeComplete;
 
         [SerializeField] private int _moneyLostOnFail = 20;
         [SerializeField] private Transform _beerCupPref;
@@ -21,6 +24,7 @@ namespace Game
         void OnEnable()
         {
             OnServerFail += OnServerFailHandler;
+            OnServeComplete += OnServeCompleteHandler;
         }
         void Start()
         {
@@ -29,13 +33,22 @@ namespace Game
         void OnDisable()
         {
             OnServerFail += OnServerFailHandler;
+            OnServeComplete -= OnServeCompleteHandler;
         }
         #endregion
 
 
-        private void OnServerFailHandler()
+        private void OnServerFailHandler(Vector3 failPosition)
         {
             MoneyManager.Instance.RemoveMoney(_moneyLostOnFail);
+            TextPopup.Show("-" + _moneyLostOnFail, failPosition, Color.red);
+            SoundManager.PlaySound(SoundEnum.ServeFail, failPosition);
+            FlashingUI.Instance.Flash(Color.red);
+            CustomCamera.Instance.Shake();
+        }
+        private void OnServeCompleteHandler(Customer completeCustomer)
+        {
+            SoundManager.PlaySound(SoundEnum.ServeComplete, completeCustomer.transform.position);
         }
 
         public void ServeBeer()
@@ -51,7 +64,7 @@ namespace Game
 
             BeerCup beerCup = Instantiate(_beerCupPref, startPosition, Quaternion.identity).GetComponent<BeerCup>();
             float moveSpeed = 5;
-            NoodyCustomCode.StartUpdater(() =>
+            NoodyCustomCode.StartUpdater(beerCup, () =>
             {
                 if (beerCup == null) return true;
 

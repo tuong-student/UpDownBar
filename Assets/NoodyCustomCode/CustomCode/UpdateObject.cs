@@ -15,7 +15,7 @@ public class UpdateObject : MonoBehaviour
     {
         return new GameObject("UpdateObject " + objectName).AddComponent<UpdateObject>();
     }
-    public static void Create(Func<bool> func, string functionName, bool stopAllWithTheSameName)
+    public static UpdateObject Create(object target, Func<bool> func, string functionName, bool stopAllWithTheSameName)
     {
         InitIfNeed();
 
@@ -25,10 +25,15 @@ public class UpdateObject : MonoBehaviour
         }
 
         UpdateObject updateObject = UpdateObject.Create("UpdateObject " + functionName);
-        updateObject._func = func;
+        updateObject._func = () => 
+        {
+            if (target == null) return true;
+            else return func.Invoke();
+        };
         updateObject._functionName = functionName;
 
         updateObjects.Add(updateObject);
+        return updateObject;
     }
     private static void InitIfNeed()
     {
@@ -48,8 +53,7 @@ public class UpdateObject : MonoBehaviour
         {
             if(_func?.Invoke() == true)
             {
-                if(this.gameObject != null)
-                    Destroy(this.gameObject);
+                DestroySelf();
             }
         }
     }
@@ -60,6 +64,10 @@ public class UpdateObject : MonoBehaviour
     public void Resume()
     {
         _isPause = false;
+    }
+    public void Stop()
+    {
+        DestroySelf();
     }
     #endregion
 

@@ -17,7 +17,7 @@ namespace Game
             if(other.gameObject.CompareTag(PUNISH_TAG))
             {
                 Destroy(this.gameObject);
-                BeerServeManager.Instance.OnServerFail?.Invoke();            
+                BeerServeManager.Instance.OnServerFail?.Invoke(this.transform.position);            
             }
         }
         void OnDisable()

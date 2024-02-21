@@ -17,23 +17,40 @@ namespace Game
         #endregion
 
         [Header("In game menu")]
+        [SerializeField] private GameObject _ingameMenu;
         [SerializeField] private TextMeshProUGUI _moneyText;
         [SerializeField] private TextMeshProUGUI _timeText;
         [SerializeField] private Image _timeBG;
+        [SerializeField] private TextMeshProUGUI _dayText;
+        [SerializeField] private CustomButton _pauseGameBtn;
+
         [Header("End day menu")]
-        [SerializeField] private GameObject _endDayPanel;
+        [SerializeField] private GameObject _endDayMenu;
         [SerializeField] private TextMeshProUGUI _money;
         [SerializeField] private CustomButton _shopBtn, _nextDayBtn;
         [SerializeField] private float _timeIncreaseSpeed = 30;
+
+        [Header("Pause game menu")]
+        [SerializeField] private GameObject _pauseGameMenu;
+        [SerializeField] private TextMeshProUGUI _pMoneyText, _pDayText;
+        [SerializeField] private CustomButton _pResumeBtn;
+
         [Header("Store")]
         [SerializeField] private CustomButton _confirmButton;
 
         #region Unity functions
         void Awake()
         {
-            _endDayPanel.SetActive(false);
+            _endDayMenu.SetActive(false);
+            _pauseGameMenu.SetActive(false);
+            _pauseGameBtn.OnClick += PauseGame;
+            _pResumeBtn.OnClick += Resume;
             _shopBtn.OnClick += ActiveStorePhrase;
-            _nextDayBtn.OnClick += () => OnNextDayPressed?.Invoke();
+            _nextDayBtn.OnClick += () =>
+            {
+                OnNextDayPressed?.Invoke();
+                UpdateDayText();
+            };
             _confirmButton.OnClick += () => 
             {
                 OpenEndDayPanel();
@@ -72,11 +89,15 @@ namespace Game
         {
             OnNextDayPressed -= HideEndDayPanel;
             _shopBtn.OnClick -= ActiveStorePhrase;
-            _endDayPanel.transform.DOKill();
+            _endDayMenu.transform.DOKill();
         }
         #endregion
 
         #region In game
+        public void UpdateDayText()
+        {
+            _dayText.text = "Day " + TimeManager.Instance.GetCurrentDay().ToString("00");
+        }
         public void UpdateMoney()
         {
             _moneyText.text = MoneyManager.Instance.GetMoney().ToString();
@@ -99,13 +120,15 @@ namespace Game
         }
         private void OpenEndDayPanel()
         {
-            _endDayPanel.SetActive(true);
-            _endDayPanel.transform.DOScale(Vector3.one, 0.7f);
+            _ingameMenu.SetActive(false);
+            _endDayMenu.SetActive(true);
+            _endDayMenu.transform.DOScale(Vector3.one, 0.7f);
             EventSystem.current.SetSelectedGameObject(null);
         }
         private void HideEndDayPanel()
         {
-            _endDayPanel.transform.DOScale(Vector3.zero, 0.7f).OnComplete(() => _endDayPanel.SetActive(false));
+            _ingameMenu.SetActive(true);
+            _endDayMenu.transform.DOScale(Vector3.zero, 0.7f).OnComplete(() => _endDayMenu.SetActive(false));
         }
         private void PlayMoneyAnimation(int money)
         {
@@ -126,6 +149,32 @@ namespace Game
             OnStorePhase?.Invoke();
         }
         #endregion
-    }
 
+        #region PauseGame
+        private void PauseGame()
+        {
+            ShowPauseGameMenu();
+            UpdatePauseText();
+            TimeManager.TimeScale = 0;
+        }
+        private void Resume()
+        {
+            HidePauseGameMenu();
+            TimeManager.TimeScale = 1;
+        }
+        private void ShowPauseGameMenu()
+        {
+            _pauseGameMenu.SetActive(true);
+        }
+        private void HidePauseGameMenu()
+        {
+            _pauseGameMenu.SetActive(false);
+        }
+        private void UpdatePauseText()
+        {
+            _pDayText.text = TimeManager.Instance.GetCurrentDay().ToString("00");
+            _pMoneyText.text = MoneyManager.Instance.GetMoney().ToString("0");
+        }
+        #endregion
+    }
 }

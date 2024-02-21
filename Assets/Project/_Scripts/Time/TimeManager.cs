@@ -10,12 +10,23 @@ namespace Game
         #region Events
         public Action OnTimeWarning;
         public Action OnTimeUp;
+        public static Action OnTimePause;
+        public static Action OnTimeResume;
         #endregion
 
         #region Property
         public static float DeltaTime => Time.deltaTime * TimeScale;
         public static float UnScaledDeltaTime => Time.unscaledDeltaTime;
-        public static float TimeScale { get; set; }
+        private static float s_timeScale = 1;
+        public static float TimeScale { get => s_timeScale; set 
+            {
+                if (value == 0)
+                    OnTimePause?.Invoke();
+                else
+                    OnTimeResume?.Invoke();
+                s_timeScale = value;
+            } 
+        }
         #endregion
 
         #region SerializeField
@@ -26,6 +37,7 @@ namespace Game
         #region Private
         private float _hour;
         private float _minute;
+        private float _day = 1;
         private bool _isWarned, _isTimeUp;
         #endregion
 
@@ -36,9 +48,13 @@ namespace Game
             GameplayManager.Instance.OnNextDay += ResetTimeScale;
             GameplayManager.Instance.OnNextDay += ResetTime;
         }
+        void OnEnable()
+        {
+            UIManager.Instance.OnNextDayPressed += NextDay;
+        }
         private void Update()
         {
-            _minute += Time.deltaTime * _timeMultipler;  
+            _minute += DeltaTime * _timeMultipler * TimeScale;  
             if(_minute >= 59)
             {
                 _hour++;
@@ -56,7 +72,6 @@ namespace Game
                 if(_isTimeUp == false)
                 {
                     OnTimeUp?.Invoke();
-                    TimeScale = 0;
                     _isTimeUp = true;
                     SoundManager.PlaySound(SoundEnum.EndLevel);
                 }
@@ -66,6 +81,7 @@ namespace Game
         {
             GameplayManager.Instance.OnNextDay -= ResetTimeScale;
             GameplayManager.Instance.OnNextDay -= ResetTime;
+            UIManager.Instance.OnNextDayPressed -= NextDay;
         }
         #endregion
 
@@ -79,6 +95,14 @@ namespace Game
             _minute = 0;
             _isTimeUp = false;
             _isWarned = false;
+        }
+        private void NextDay()
+        {
+            _day += 1;
+        }
+        public float GetCurrentDay()
+        {
+            return _day;
         }
         private void Warning()
         {

@@ -30,6 +30,8 @@ MonoBehaviour:
       _value: {fileID: 8300000, guid: 47abd8e584aa57c4fa292f08af3211a1, type: 3}
     - _key: MoneySound
       _value: {fileID: 8300000, guid: 63d1ee95bb4ebe048b61cd3d7e659ba8, type: 3}
+    - _key: ServeBeer
+      _value: {fileID: 8300000, guid: 871fb5cdb4756ed4195dd6b4caf5d39f, type: 3}
   musicDic:
     _pairs:
     - _key: CrowdBGSound

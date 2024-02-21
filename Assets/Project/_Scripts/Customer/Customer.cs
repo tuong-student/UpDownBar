@@ -15,6 +15,9 @@ namespace Game
         public Action OnCustomerReturn;
         #endregion
 
+        [Header("Component")]
+        [SerializeField] private CustomerView _customerView;
+
         [Header("Waiting time")]
         [SerializeField] private WaitingUI _waitingUI;
         [SerializeField] private float _maxWaitingTime;
@@ -76,9 +79,9 @@ namespace Game
             {
                 Vector3 direction = _targetSeat - this.transform.position;
                 direction = Vector3.Normalize(direction);
-                this.transform.position += direction * _speed * TimeManager.UnScaledDeltaTime;
+                this.transform.position += direction * _speed * TimeManager.DeltaTime;
                 this.transform.DOKill(); // To stop rotate
-                this.transform.forward = Vector3.Lerp(this.transform.forward, direction, TimeManager.UnScaledDeltaTime* _rotateSpeed);
+                this.transform.forward = Vector3.Lerp(this.transform.forward, direction, TimeManager.DeltaTime* _rotateSpeed);
             }
             else
             {
@@ -97,7 +100,7 @@ namespace Game
         {
             if(_isWaiting)
             {
-                _waitTimer += Time.deltaTime * _waitLossSpeed;
+                _waitTimer += TimeManager.DeltaTime * _waitLossSpeed;
                 _waitingUI.UpdateWaitingUI(_waitTimer / _maxWaitingTime);        
             }
             if(_waitTimer >= _maxWaitingTime)
@@ -133,11 +136,16 @@ namespace Game
                 float distance = Vector3.Distance(this.transform.position, _targetSeat);
                 if (distance <= 0.1f)
                 {
-                    Destroy(this.gameObject);
+                    DestroySelf();
                     return true;
                 }
                 return false;
             });
+        }
+        private void DestroySelf()
+        {
+            _customerView.StopAllAnimation();
+            Destroy(this.gameObject, 1f);
         }
     }
 }

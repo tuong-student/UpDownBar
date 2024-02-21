@@ -28,10 +28,13 @@ namespace Game
             GetRandomCloth();
             _customer.OnCustomerEnterSeat += SitDown;
             _customer.OnCustomerReturn += Move;
+            TimeManager.OnTimePause += PauseAnimation;
+            TimeManager.OnTimeResume += ResumeAnimation;
         }
         void OnDestroy()
         {
             NoodyCustomCode.UnSubscribeAllEvent(_customer, this);
+            NoodyCustomCode.UnSubscribeFromStatic(typeof(TimeManager), this);
         }
 
         private void GetRandomCloth()
@@ -45,6 +48,20 @@ namespace Game
             _chest.GetRandom().enabled = true;
             _pant.GetRandom().enabled = true;
             _feet.GetRandom().enabled = true;
+        }
+
+        public void StopAllAnimation()
+        {
+            if (_moveUpdater) _moveUpdater.Stop();
+            if (_sitDownUpdater) _sitDownUpdater.Stop();
+        }
+        public void PauseAnimation()
+        {
+            _anim.speed = 0;
+        }
+        public void ResumeAnimation()
+        {
+            _anim.speed = 1;
         }
         
         private void SitDown()

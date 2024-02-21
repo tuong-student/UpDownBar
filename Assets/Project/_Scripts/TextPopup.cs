@@ -82,7 +82,6 @@ namespace Game
                 textMeshProUGUI = _textMeshProUGUIPool[0];
                 _textMeshProUGUIPool.RemoveAt(0);
                 textMeshProUGUI.transform.parent.gameObject.SetActive(true);
-                textMeshProUGUI.transform.localScale = Vector3.one;
             }
 
 
@@ -100,8 +99,6 @@ namespace Game
                 }
                 else
                 {
-                    textMeshProUGUI.transform.DOScale(0, 0.2f).SetEase(Ease.InBounce);
-                    textMeshProUGUI.transform.DOLocalMoveY(textMeshProUGUI.transform.position.y + 0.5f, 0.2f).SetEase(Ease.InElastic);
                     textMeshProUGUI.transform.parent.gameObject.SetActive(false);
                     _textMeshProUGUIPool.Add(textMeshProUGUI);
                     return true;

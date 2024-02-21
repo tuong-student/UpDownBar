@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NOOD;
+using NOOD.Sound;
 using UnityEngine;
 
 namespace Game
@@ -13,6 +14,7 @@ namespace Game
         public static Action OnPlayerPressDeliverBeer;
         private int _index = 0;
         private Vector2 _input;
+        private bool _isServePressed;
 
         private void Update()
         {
@@ -21,17 +23,19 @@ namespace Game
         
         private void Move()
         {
-            _input = GetInput();
+            GetInput();
+            if(_isServePressed)
+            {
+                BeerServeManager.Instance.ServeBeer();
+                OnPlayerPressDeliverBeer?.Invoke();
+                SoundManager.PlaySound(SoundEnum.ServeBeer);
+            }
+
             CalculateStandIndex();
 
             Vector3 standPosition = new Vector3(this.transform.position.x, 0, TableManager.Instance.GetPlayerTablePosition().z);
             this.transform.position = standPosition;
 
-            if(Input.GetKeyDown(KeyCode.Space))
-            {
-                BeerServeManager.Instance.ServeBeer();
-                OnPlayerPressDeliverBeer?.Invoke();
-            }
         }
 
         private int CalculateStandIndex()
@@ -56,8 +60,9 @@ namespace Game
             return _index;
         }
 
-        private Vector2 GetInput()
+        private void GetInput()
         {
+            _isServePressed = false;
             float y = 0;
             if(Input.GetKeyDown(KeyCode.W))
             {
@@ -67,8 +72,12 @@ namespace Game
             {
                 y = -1;
             }
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                _isServePressed = true;
+            }
 
-            return new Vector2(0, y);
+            _input = new Vector2(0, y);
         }
     }
 }

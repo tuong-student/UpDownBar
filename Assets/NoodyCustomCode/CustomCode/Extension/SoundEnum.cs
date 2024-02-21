@@ -10,5 +10,6 @@ public enum SoundEnum
 	Timer = 5,
 	EndLevel = 6,
 	MoneySound = 7,
+	ServeBeer = 8,
 }
 }

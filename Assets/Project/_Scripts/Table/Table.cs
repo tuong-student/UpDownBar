@@ -10,21 +10,20 @@ namespace Game
         [SerializeField] private List<Transform> _availableSeats = new List<Transform>();
         private Queue<Transform> _lockSeatList = new Queue<Transform>();
         private Dictionary<Customer, Transform> _unAvailableSeat = new Dictionary<Customer, Transform>();
+        private bool _unlockAllSeats;
 
         #region Unity Functions
         private void Start()
         {
-            while(_availableSeats.Count > 1)
+            while(_availableSeats.Count > 1 && _unlockAllSeats == false)
             {
+                // Deactivate all seats but 1
                 Transform seat = _availableSeats[1];
                 seat.gameObject.SetActive(false);
                 _lockSeatList.Enqueue(seat);
                 _availableSeats.Remove(seat);
             }
-            GameStart();
             TableManager.Instance.OnCustomComplete += OnCustomerCompleteHandler;
-            UIManager.Instance.OnStorePhase += OnStorePhaseHandler;
-            GameplayManager.Instance.OnNextDay += GameStart;
         }
         private void OnDestroy()
         {
@@ -42,14 +41,12 @@ namespace Game
         #endregion
 
         #region Event functions
-        private void OnStorePhaseHandler()
-        {
-        }
         #endregion
 
         #region In game functions
-        private void GameStart()
+        public void SetIsUnlockAllSeats(bool value)
         {
+            _unlockAllSeats = value;
         }
         #endregion
 

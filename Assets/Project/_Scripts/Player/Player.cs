@@ -15,6 +15,7 @@ namespace Game
         private int _index = 0;
         private Vector2 _input;
         private bool _isServePressed;
+        private bool _isPausePressed;
 
         private void Update()
         {
@@ -29,6 +30,10 @@ namespace Game
                 BeerServeManager.Instance.ServeBeer();
                 OnPlayerPressDeliverBeer?.Invoke();
                 SoundManager.PlaySound(SoundEnum.ServeBeer);
+            }
+            if(_isPausePressed)
+            {
+                GameplayManager.Instance.OnPausePressed?.Invoke();
             }
 
             CalculateStandIndex();
@@ -63,18 +68,23 @@ namespace Game
         private void GetInput()
         {
             _isServePressed = false;
+            _isPausePressed = false;
             float y = 0;
-            if(Input.GetKeyDown(KeyCode.W))
+            if(Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
                 y = 1;
             }
-            if(Input.GetKeyDown(KeyCode.S))
+            if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
                 y = -1;
             }
             if(Input.GetKeyDown(KeyCode.Space))
             {
                 _isServePressed = true;
+            }
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                _isPausePressed = true;
             }
 
             _input = new Vector2(0, y);

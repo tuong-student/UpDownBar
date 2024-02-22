@@ -51,14 +51,13 @@ namespace Game
 
         private void OpenHowToPlay()
         {
-            _howToPlayPanel.alpha = 1;
+            _howToPlayPanel.gameObject.SetActive(true);
             _howToPlayPanel.transform.localScale = Vector3.zero;
-            _howToPlayPanel.transform.DOScale(Vector3.one, 0.7f).SetEase(Ease.OutBounce);
+            _howToPlayPanel.transform.DOScale(Vector3.one, 0.7f).SetEase(Ease.OutQuart);
         }
         private void CloseHowToPlay()
         {
-            _howToPlayPanel.transform.DOScale(Vector3.zero, 1f).SetEase(Ease.OutExpo);
-            NoodyCustomCode.FadeCanvasGroup(_howToPlayPanel, _howToPlayPanel, 0, 220f);
+            _howToPlayPanel.transform.DOScale(Vector3.zero, 1f).SetEase(Ease.InQuad);
         }
     }
 }

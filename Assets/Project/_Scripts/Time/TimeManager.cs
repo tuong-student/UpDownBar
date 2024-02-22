@@ -39,6 +39,7 @@ namespace Game
         private float _minute;
         private float _day = 1;
         private bool _isWarned, _isTimeUp;
+        private bool _isPause;
         #endregion
 
         #region Unity functions
@@ -50,7 +51,12 @@ namespace Game
         }
         void OnEnable()
         {
-            UIManager.Instance.OnNextDayPressed += NextDay;
+            if(UIManager.Instance)
+                UIManager.Instance.OnNextDayPressed += NextDay;
+        }
+        void Start()
+        {
+            GameplayManager.Instance.OnPausePressed += PauseGame;
         }
         private void Update()
         {
@@ -79,12 +85,19 @@ namespace Game
         }
         void OnDisable()
         {
-            GameplayManager.Instance.OnNextDay -= ResetTimeScale;
-            GameplayManager.Instance.OnNextDay -= ResetTime;
-            UIManager.Instance.OnNextDayPressed -= NextDay;
+            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
         }
         #endregion
 
+        private void PauseGame()
+        {
+            _isPause = !_isPause;
+            if (_isPause)
+                TimeScale = 0;
+            else
+                TimeScale = 1;
+        }
         private void ResetTimeScale()
         {
             TimeScale = 1;

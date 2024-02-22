@@ -9,12 +9,19 @@ namespace Game
     {
         public Action OnEndDay;
         public Action OnNextDay;
+        public Action OnPausePressed;
         public bool IsEndDay;
 
         void OnEnable()
         {
-            TimeManager.Instance.OnTimeUp += OnTimeUpHandler;
-            UIManager.Instance.OnNextDayPressed += OnNextDayPressHandler;
+            if(TimeManager.Instance)
+            {
+                TimeManager.Instance.OnTimeUp += OnTimeUpHandler;
+            }
+            if(UIManager.Instance)
+            {
+                UIManager.Instance.OnNextDayPressed += OnNextDayPressHandler;
+            }
             SoundManager.InitSoundManager();
         }
         void OnDisable()
@@ -26,6 +33,7 @@ namespace Game
         {
             SoundManager.PlayMusic(MusicEnum.PianoBGMusic);
             SoundManager.PlayMusic(MusicEnum.CrowdBGSound);
+            TimeManager.TimeScale = 1;
         }
 
         #region Event functions

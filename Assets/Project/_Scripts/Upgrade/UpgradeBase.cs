@@ -24,9 +24,15 @@ namespace Game
         protected void OnEnable()
         {
             _upgradeUI.OnUpgradeButtonClick += OnUpgradeButtonClickHandler;
-            GameplayManager.Instance.OnNextDay += HideUI;
-            UIManager.Instance.OnStorePhase += ShowUI;
-            UIManager.Instance.OnStorePhase += OnStorePhaseHandler;
+            if(GameplayManager.Instance)
+            {
+                GameplayManager.Instance.OnNextDay += HideUI;
+            }
+            if(UIManager.Instance)
+            {
+                UIManager.Instance.OnStorePhrase += ShowUI;
+                UIManager.Instance.OnStorePhrase += OnStorePhaseHandler;
+            }
             ChildOnEnable();
         }
         protected void OnDisable()

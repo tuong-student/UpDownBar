@@ -11,11 +11,16 @@ namespace Game
         public Action<Customer> OnCustomComplete;
         public Action<Customer> OnCustomerRequestBeer;
         [SerializeField] private List<Table> _tableList = new List<Table>();
+        [SerializeField] private bool _unlockAllSeats;
         private int _currentTableIndex = 0;
 
         void OnEnable()
         {
             Player.OnPlayerChangePosition += OnPlayerChangePositionHandler;
+            foreach(Table table in _tableList)
+            {
+                table.SetIsUnlockAllSeats(_unlockAllSeats);
+            }
         }
         void OnDisable()
         {

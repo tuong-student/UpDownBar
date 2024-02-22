@@ -6,13 +6,14 @@ using UnityEngine.UI;
 using DG.Tweening;
 using UnityEngine.EventSystems;
 using NOOD.Sound;
+using EasyTransition;
 
 namespace Game
 {
     public class UIManager : MonoBehaviorInstance<UIManager>
     {
         #region Events
-        public Action OnStorePhase;
+        public Action OnStorePhrase;
         public Action OnNextDayPressed;
         #endregion
 
@@ -33,19 +34,27 @@ namespace Game
         [Header("Pause game menu")]
         [SerializeField] private GameObject _pauseGameMenu;
         [SerializeField] private TextMeshProUGUI _pMoneyText, _pDayText;
-        [SerializeField] private CustomButton _pResumeBtn;
+        [SerializeField] private CustomButton _pResumeBtn, _pToMainMenuBtn;
+        [SerializeField] private TransitionSettings _transitionSetting;
 
         [Header("Store")]
+        [SerializeField] private GameObject _storeMenu;
         [SerializeField] private CustomButton _confirmButton;
+        private bool _isStorePhrase;
 
         #region Unity functions
         void Awake()
         {
             _endDayMenu.SetActive(false);
             _pauseGameMenu.SetActive(false);
-            _pauseGameBtn.OnClick += PauseGame;
-            _pResumeBtn.OnClick += Resume;
-            _shopBtn.OnClick += ActiveStorePhrase;
+            _pauseGameBtn.OnClick += OnPauseButtonClickHandler;
+            _pResumeBtn.OnClick += OnResumeClickHandler;
+            _shopBtn.OnClick += () =>
+            {
+                ActiveStorePhrase();
+                _isStorePhrase = true;
+            };
+            _pToMainMenuBtn.OnClick += OnMainMenuClickHandler;
             _nextDayBtn.OnClick += () =>
             {
                 OnNextDayPressed?.Invoke();
@@ -54,14 +63,11 @@ namespace Game
             _confirmButton.OnClick += () => 
             {
                 OpenEndDayPanel();
-                _confirmButton.gameObject.SetActive(false);
+                HideStoreMenu();
+                _isStorePhrase = false;
             };
             _confirmButton.gameObject.SetActive(false);
             OnNextDayPressed += HideEndDayPanel;
-        }
-        void OnEnable()
-        {
-            GameplayManager.Instance.OnEndDay += OnEndDayHandler;
         }
         private void Start()
         {
@@ -75,6 +81,9 @@ namespace Game
             {
                 _timeBG.color = Color.white;
             };
+            TimeManager.OnTimePause += ShowPauseGameMenu;
+            TimeManager.OnTimeResume += HidePauseGameMenu;
+            GameplayManager.Instance.OnEndDay += OnEndDayHandler;
         }
         private void Update()
         {
@@ -84,6 +93,7 @@ namespace Game
         void OnDisable()
         {
             NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<TimeManager>(this);
         }
         private void OnDestroy()
         {
@@ -108,6 +118,14 @@ namespace Game
             float minute = TimeManager.Instance.GetMinute();
 
             _timeText.text = $"{hour.ToString("00")}:{minute.ToString("00")}";
+        }
+        private void HideIngameMenu()
+        {
+            _ingameMenu.SetActive(false);
+        }
+        private void ShowIngameMenu()
+        {
+            _ingameMenu.SetActive(true);
         }
         #endregion
 
@@ -145,30 +163,36 @@ namespace Game
         private void ActiveStorePhrase()
         {
             HideEndDayPanel();
-            _confirmButton.gameObject.SetActive(true);
-            OnStorePhase?.Invoke();
+            ShowStoreMenu();
+            OnStorePhrase?.Invoke();
+        }
+        #endregion
+
+        #region Store Menu
+        private void ShowStoreMenu()
+        {
+            _storeMenu.SetActive(true);
+        }
+        private void HideStoreMenu()
+        {
+            _storeMenu.SetActive(false);
         }
         #endregion
 
         #region PauseGame
-        private void PauseGame()
-        {
-            ShowPauseGameMenu();
-            UpdatePauseText();
-            TimeManager.TimeScale = 0;
-        }
-        private void Resume()
-        {
-            HidePauseGameMenu();
-            TimeManager.TimeScale = 1;
-        }
         private void ShowPauseGameMenu()
         {
             _pauseGameMenu.SetActive(true);
+            HideIngameMenu();
+            HideStoreMenu();
+            UpdatePauseText();
         }
         private void HidePauseGameMenu()
         {
             _pauseGameMenu.SetActive(false);
+            ShowIngameMenu();
+            if(_isStorePhrase)
+                ShowStoreMenu();
         }
         private void UpdatePauseText()
         {
@@ -176,5 +200,21 @@ namespace Game
             _pMoneyText.text = MoneyManager.Instance.GetMoney().ToString("0");
         }
         #endregion
+ 
+        #region ButtonZone
+        private void OnPauseButtonClickHandler()
+        {
+            GameplayManager.Instance.OnPausePressed?.Invoke();
+        }
+        private void OnMainMenuClickHandler()
+        {
+            TransitionManager.Instance().Transition("MainMenu", _transitionSetting, 0.3f);
+        }
+        private void OnResumeClickHandler()
+        {
+            HidePauseGameMenu();
+            GameplayManager.Instance.OnPausePressed?.Invoke();
+        }
+        #endregion   
     }
 }

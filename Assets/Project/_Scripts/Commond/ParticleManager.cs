@@ -41,7 +41,6 @@ namespace Game
                 }
             }
 
-            Debug.Log(particleSystem.gameObject.name);
             particleSystem.gameObject.SetActive(true);
             particleSystem.transform.position = position;
             particleSystem.Play();

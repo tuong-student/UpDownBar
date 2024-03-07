@@ -12,7 +12,7 @@ namespace Game
         public Action OnPausePressed;
         public bool IsEndDay;
 
-        void OnEnable()
+        void Start()
         {
             if(TimeManager.Instance)
             {
@@ -23,17 +23,14 @@ namespace Game
                 UIManager.Instance.OnNextDayPressed += OnNextDayPressHandler;
             }
             SoundManager.InitSoundManager();
-        }
-        void OnDisable()
-        {
-            NoodyCustomCode.UnSubscribeAllEvent<TimeManager>(this);
-            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
-        }
-        void Start()
-        {
             SoundManager.PlayMusic(MusicEnum.PianoBGMusic);
             SoundManager.PlayMusic(MusicEnum.CrowdBGSound);
             TimeManager.TimeScale = 1;
+        }
+        void OnDestroy()
+        {
+            NoodyCustomCode.UnSubscribeAllEvent<TimeManager>(this);
+            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
         }
 
         #region Event functions

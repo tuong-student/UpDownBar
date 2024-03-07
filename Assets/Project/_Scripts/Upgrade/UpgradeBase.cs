@@ -6,17 +6,17 @@ namespace Game
 {
     public abstract class UpgradeBase : MonoBehaviour
     {
-        public int Price;
-        public float PriceMultipler = 100;
+        public int Price = 100;
+        public float PriceMultipler = 1.5f;
     
         [SerializeField] protected UpgradeUI _upgradeUI;
         [SerializeField] protected UpgradeAction _upgradeAction;
+        protected int _upgradeTime = 1;
 
         #region Unity functions
         protected void Awake()
         {
             _upgradeUI.SetParent(this);
-            Price = (int)PriceMultipler;
             HideUI();
             ChildAwake();
         }
@@ -30,11 +30,25 @@ namespace Game
             }
             if(UIManager.Instance)
             {
-                UIManager.Instance.OnStorePhrase += ShowUI;
+                UIManager.Instance.OnStorePhrase += OnStorePhraseHandler;
                 UIManager.Instance.OnStorePhrase += OnStorePhaseHandler;
             }
             ChildOnEnable();
         }
+        protected void Start()
+        {
+            if(GameplayManager.Instance)
+            {
+                GameplayManager.Instance.OnNextDay += HideUI;
+            }
+            if(UIManager.Instance)
+            {
+                UIManager.Instance.OnStorePhrase += OnStorePhraseHandler;
+                UIManager.Instance.OnStorePhrase += OnStorePhaseHandler;
+            }
+            ChildStart();
+        }
+        protected virtual void ChildStart(){}
         protected void OnDisable()
         {
             _upgradeUI.OnUpgradeButtonClick -= OnUpgradeButtonClickHandler;
@@ -44,6 +58,17 @@ namespace Game
         }
         protected virtual void ChildOnDisable(){}
         protected virtual void ChildOnEnable(){}
+        #endregion
+
+        #region Abstract functions
+        protected abstract void Save();
+        protected abstract void Load();
+        protected abstract string GetId();
+        protected abstract bool CheckAllUpgradeComplete();
+        /// <summary>
+        /// This function is inherited by child to b/c it is set by child
+        /// </summary>
+        protected abstract void UpdateUpgradeTime();
         #endregion
 
         private void OnUpgradeButtonClickHandler()
@@ -57,19 +82,31 @@ namespace Game
             _upgradeAction.Invoke();
         }
 
-        public virtual void AutoSetNewPrice(int upgradeTime)
+        /// <summary>
+        /// Update price base on own setting of the child upgradeTime
+        /// </summary>
+        public virtual void UpdatePrice()
         {
-            Price += (int) (upgradeTime * PriceMultipler);
+            UpdateUpgradeTime();
+            Price = (int) (_upgradeTime * PriceMultipler) + 50;
+            Save();
         }
 
-        public void ShowUI()
+        public void OnStorePhraseHandler()
         {
-            _upgradeUI.gameObject.SetActive(true);
-            _upgradeUI.UpdateMoneyText();
+            if(CheckAllUpgradeComplete() == false)
+                ShowUI();
         }
+
         public void HideUI()
         {
             _upgradeUI.gameObject.SetActive(false);
+        }
+        private void ShowUI()
+        {
+            UpdatePrice();
+            _upgradeUI.gameObject.SetActive(true);
+            _upgradeUI.UpdateMoneyText();
         }
     }
 }

@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NOOD.UI;
 using NOOD.Data;
 using NOOD.Extension;
-using System.IO;
 
 namespace NOOD.UI
 {

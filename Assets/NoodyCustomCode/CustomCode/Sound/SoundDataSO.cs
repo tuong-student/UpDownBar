@@ -3,9 +3,6 @@ using UnityEngine;
 using NOOD.SerializableDictionary;
 using NOOD.Extension;
 using UnityEditor;
-using NOOD.Sound;
-using System.IO;
-using System;
 
 namespace NOOD.Sound
 {

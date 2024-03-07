@@ -1,20 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using NOOD;
+using NOOD.Data;
 using UnityEngine;
 
 namespace Game
 {
     public class MoneyManager : MonoBehaviorInstance<MoneyManager>
     {
+        const string SAVE_ID = "Money";
         private int _money;
+        protected override void ChildAwake()
+        {
+            _money = DataManager<int>.LoadDataFromPlayerPrefWithGenId(SAVE_ID, 0);
+            Debug.Log(_money);
+        }
 
         public int GetMoney() => _money;
-        public void AddMoney(int amount)
-        {
-            _money += amount;
-            UIManager.Instance.UpdateMoney();
-        }
         public bool PayMoney(int amount)
         {
             if (_money >= amount)
@@ -34,6 +34,15 @@ namespace Game
         {
             _money -= amount;
             UIManager.Instance.UpdateMoney();
+        }
+        public void AddMoney(int amount)
+        {
+            _money += amount;
+            UIManager.Instance.UpdateMoney();
+        }
+        public void Save()
+        {
+            _money.SaveWithId(SAVE_ID);
         }
     }
 

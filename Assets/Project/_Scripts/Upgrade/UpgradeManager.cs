@@ -1,28 +1,31 @@
-using System.Collections;
 using System.Collections.Generic;
 using NOOD;
-using UnityEngine;
 
 namespace Game
 {
     public class UpgradeManager : MonoBehaviorInstance<UpgradeManager>
     {
-        private Dictionary<UpgradeBase, int> _upgradeTimeDic = new Dictionary<UpgradeBase, int>();
+        private List<UpgradeBase> _upgradeBaseList = new List<UpgradeBase>();
+
+        protected override void ChildAwake()
+        {
+            _upgradeBaseList = new List<UpgradeBase>();
+        }
 
         public void Upgrade(UpgradeBase upgradeBase)
         {
             if (MoneyManager.Instance.PayMoney(upgradeBase.Price))
             {
                 upgradeBase.Upgrade();
-                if(_upgradeTimeDic.ContainsKey(upgradeBase))
+                if(_upgradeBaseList.Contains(upgradeBase))
                 {
-                    _upgradeTimeDic[upgradeBase] += 1;
-                    upgradeBase.AutoSetNewPrice(_upgradeTimeDic[upgradeBase]);
+                    int index = _upgradeBaseList.IndexOf(upgradeBase);
+                    upgradeBase.UpdatePrice();
                 }
                 else
                 {
-                    _upgradeTimeDic.Add(upgradeBase, 2);
-                    upgradeBase.AutoSetNewPrice(_upgradeTimeDic[upgradeBase]);
+                    _upgradeBaseList.Add(upgradeBase);
+                    upgradeBase.UpdatePrice();
                 }
             }
             else
@@ -31,8 +34,6 @@ namespace Game
                 // Debug.Log("Do not enough money");
             }
         }
-
-        
     }
 
 }

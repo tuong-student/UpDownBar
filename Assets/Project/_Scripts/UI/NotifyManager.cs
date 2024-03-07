@@ -9,13 +9,14 @@ namespace Game
     {
         [SerializeField] private TextMeshProUGUI _textMeshProUGUI;
         [SerializeField] private Transform _showPos, _hidePos;
+        [SerializeField] private LocalizationLabel _localizationLabel;
         private bool _isShow = false;
 
         public void Show(string text)
         {
             if (_isShow == true) return;
 
-            Debug.Log(_textMeshProUGUI != null);
+            _localizationLabel.UpdateText();
             _textMeshProUGUI.text = text;
             this.transform.DOMove(_showPos.position, 0.8f).SetEase(Ease.OutElastic);
             _isShow = true;

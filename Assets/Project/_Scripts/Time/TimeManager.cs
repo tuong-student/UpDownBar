@@ -43,24 +43,22 @@ namespace Game
         #endregion
 
         #region Unity functions
-        void Awake()
+        protected override void ChildAwake()
         {
             TimeScale = 1;
-            GameplayManager.Instance.OnNextDay += ResetTimeScale;
-            GameplayManager.Instance.OnNextDay += ResetTime;
-        }
-        void OnEnable()
-        {
-            if(UIManager.Instance)
-                UIManager.Instance.OnNextDayPressed += NextDay;
         }
         void Start()
         {
+            if(UIManager.Instance)
+                UIManager.Instance.OnNextDayPressed += NextDay;
+            GameplayManager.Instance.OnNextDay += ResetTimeScale;
+            GameplayManager.Instance.OnNextDay += ResetTime;
             GameplayManager.Instance.OnPausePressed += PauseGame;
         }
         private void Update()
         {
-            _minute += DeltaTime * _timeMultipler * TimeScale;  
+            if(_isTimeUp == false)
+                _minute += DeltaTime * _timeMultipler * TimeScale;  
             if(_minute >= 59)
             {
                 _hour++;
@@ -83,7 +81,7 @@ namespace Game
                 }
             }
         }
-        void OnDisable()
+        void OnDestroy()
         {
             NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
             NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);

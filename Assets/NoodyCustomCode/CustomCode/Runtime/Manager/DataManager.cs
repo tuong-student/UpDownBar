@@ -20,10 +20,7 @@ namespace NOOD.Data
         {
             get
             {
-                if (_data == null)
-                {
-                    QuickLoad();
-                }
+                TryLoad();
                 return _data;
             }
         }
@@ -32,17 +29,16 @@ namespace NOOD.Data
         /// <summary>
         /// Use property Data to retreat data 
         /// </summary> 
-        private static void QuickLoad()
+        private static void TryLoad()
         {
-            Debug.Log("QuickLoad");
             if (PlayerPrefs.HasKey(typeof(T).Name))
             {
                 Debug.Log("QuickLoad Has Key");
                 _data = LoadDataFromPlayerPref(typeof(T).Name, default);
             }
-
-            if (_data == null)
+            else
             {
+                Debug.Log("QuickLoad don't have key of " + typeof(T).Name);
                 _data = new T();
                 QuickSave();
             }
@@ -168,7 +164,7 @@ namespace NOOD.Data
         /// </summary>
         public static void QuickClear()
         {
-            QuickLoad();
+            TryLoad();
             _data = default;
             QuickSave();
         }

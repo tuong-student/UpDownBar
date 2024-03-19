@@ -78,3 +78,7 @@ MonoBehaviour:
       _value:
         Vietnamese: "Qua ng\xE0y"
         English: Next day
+    - _key: NewGame
+      _value:
+        Vietnamese: "Ch\u01A1i m\u1EDBi"
+        English: New Game

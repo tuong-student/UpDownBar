@@ -21,6 +21,7 @@ namespace Game
             {
                 _money -= amount;
                 UIManager.Instance.UpdateMoney();
+                Save();
                 return true;
             }
             else

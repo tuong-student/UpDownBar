@@ -11,8 +11,8 @@ namespace Game
     public class MainMenu : MonoBehaviour
     {
         [Header("Main menu")]
-        [SerializeField] private CustomButton _playBtn, _howToPlay, _exit;
         [SerializeField] private Image _chooseImage;
+        [SerializeField] private CustomButton _newGame, _playBtn, _howToPlay, _exit;
         [SerializeField] private TransitionSettings _transitionSetting;
 
         [Header("How to play")]
@@ -21,6 +21,10 @@ namespace Game
 
         void Start()
         {
+            _newGame.OnHover += (() =>
+            {
+                _chooseImage.transform.position = _chooseImage.transform.position.ChangeY(_newGame.transform.position.y); 
+            });
             _playBtn.OnHover += (() =>
             {
                 _chooseImage.transform.position = _chooseImage.transform.position.ChangeY(_playBtn.transform.position.y); 
@@ -34,6 +38,7 @@ namespace Game
                 _chooseImage.transform.position =_chooseImage.transform.position.ChangeY(_exit.transform.position.y); 
             });
 
+            _newGame.OnClick += ResetSaveFile;
             _playBtn.OnClick += LoadGameScene;
             _howToPlay.OnClick += OpenHowToPlay;
             _closeBtn.OnClick += CloseHowToPlay;
@@ -42,6 +47,12 @@ namespace Game
         void OnDisable()
         {
             _howToPlayPanel.transform.DOKill();
+        }
+
+        private void ResetSaveFile()
+        {
+            PlayerPrefs.DeleteAll();
+            LoadGameScene();
         }
 
         private void LoadGameScene()

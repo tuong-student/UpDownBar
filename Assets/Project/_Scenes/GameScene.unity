@@ -411,6 +411,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 94347923}
   m_CullTransparentMesh: 1
+--- !u!1 &110876248
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 110876249}
+  - component: {fileID: 110876250}
+  m_Layer: 0
+  m_Name: CustomerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &110876249
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110876248}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 345125114}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &110876250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110876248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2490dd359e75ec488989e2b32e4a96b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
 --- !u!1 &143600061
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,6 +723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0e133c730ba8244a951d5e6a9f92a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _particleTypeDic:
     _pairs:
     - _key: 0
@@ -807,6 +853,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97741a0809ac264383b916963dc2361, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
 --- !u!1 &320534203
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,6 +1130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efff0446c794c0748a0cc79c897e78ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   TOOL_TIP: Press T to test
   duration: 0.2
   magnitude: 0.2
@@ -1131,6 +1179,7 @@ Transform:
   - {fileID: 287648350}
   - {fileID: 254998878}
   - {fileID: 1411786017}
+  - {fileID: 110876249}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &433659395
@@ -1474,6 +1523,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33531b643f5b52943a65e7afd7dc6189, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _flashingSpeed: 5
 --- !u!114 &577592543
 MonoBehaviour:
@@ -1951,6 +2001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722f07112305c294b80d9e0c19cb7c5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   IsEndDay: 0
 --- !u!114 &806084760 stripped
 MonoBehaviour:
@@ -3148,6 +3199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e90b750f7b07f4980ac9bc14797dc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _ingameMenu: {fileID: 1769211841}
   _moneyText: {fileID: 1030665077}
   _timeText: {fileID: 952618735}
@@ -4367,6 +4419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61a61d1e95b26a04ea09229286f32ade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _moneyLostOnFail: 20
   _beerCupPref: {fileID: 3033790778567492977, guid: 25e83387a40a5e44d88724a2bb83f910,
     type: 3}
@@ -4415,6 +4468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4023e2dfd135f84db6a3f9212a0a3f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _tableList:
   - {fileID: 1147995202}
   - {fileID: 806084760}
@@ -4453,7 +4507,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1591954822
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4563,6 +4617,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7277a3695946b674c86c707e7c570d3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _textMeshProUGUI: {fileID: 1710422304}
   _showPos: {fileID: 1018186992}
   _hidePos: {fileID: 931486926}
@@ -5769,6 +5824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa6e24e69df249443889d162f0779ce7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _customerPref: {fileID: 412782495169560051, guid: c4e5011adc03d3942831023eaa459a77,
     type: 3}
   _spawnTime: 0.5
@@ -5969,6 +6025,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a9570ad683d1343aec7be73207fcad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
   _timeMultipler: 6
   _hourInLevel: 3
 --- !u!4 &1949967167
@@ -6181,6 +6238,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79ab3977b85d03341b8cb44dc8cdb91b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _dontDestroyOnLoad: 0
 --- !u!4 &1986282351
 Transform:
   m_ObjectHideFlags: 0

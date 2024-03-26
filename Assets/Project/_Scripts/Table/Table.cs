@@ -8,14 +8,21 @@ namespace Game
 {
     public class Table : MonoBehaviour
     {
+        #region Variables
         [SerializeField] private List<Transform> _availableSeats = new List<Transform>();
+        [SerializeField] private List<Transform> _unAvailableSeats = new List<Transform>();
 
         public int AvailableSeatNumber = 1;
+
         private Stack<Transform> _lockSeatList = new Stack<Transform>();
-        private Dictionary<Customer, Transform> _unAvailableSeatDic = new Dictionary<Customer, Transform>();
         private bool _unlockAllSeats;
+        #endregion
 
         #region Unity Functions
+        private void OnEnable()
+        {
+            TableManager.Instance.OnReturnSeat += TableManager_OnReturnSeat;
+        }
         private void Start()
         {
             while(_availableSeats.Count > AvailableSeatNumber && _unlockAllSeats == false)
@@ -26,7 +33,6 @@ namespace Game
                 _lockSeatList.Push(seat);
                 _availableSeats.Remove(seat);
             }
-            TableManager.Instance.OnCustomComplete += OnCustomerCompleteHandler;
         }
         private void OnDestroy()
         {
@@ -44,8 +50,16 @@ namespace Game
         #endregion
 
         #region Event functions
+        private void TableManager_OnReturnSeat(Transform seat)
+        {
+            // Check if this seat is belong to this table
+            if(_unAvailableSeats.Contains(seat))
+            {
+                _availableSeats.Add(seat);
+                _unAvailableSeats.Remove(seat);
+            }
+        }
         #endregion
-
         #region In game functions
         public void SetIsUnlockAllSeats(bool value)
         {
@@ -53,6 +67,19 @@ namespace Game
         }
         #endregion
 
+        #region Get
+        #endregion
+
+        #region Seat
+        public Transform GetRandomSeat()
+        {
+            int r = Random.Range(0, _availableSeats.Count - 1);
+            Transform seat = _availableSeats[r];
+            _availableSeats.Remove(seat);
+            _unAvailableSeats.Add(seat);
+
+            return seat;
+        }
         public void UnlockSeat()
         {
             Transform seat = _lockSeatList.Pop();
@@ -60,26 +87,16 @@ namespace Game
             _availableSeats.Add(seat);
             TableManager.Instance.OnTableUpgrade?.Invoke(this);
         }
-        public void OnCustomerCompleteHandler(Customer customer)
+        public void ReturnSeat(Transform seat)
         {
-            if(_unAvailableSeatDic.ContainsKey(customer))
-            {
-                _availableSeats.Add(_unAvailableSeatDic[customer]);
-                _unAvailableSeatDic.Remove(customer);
-            }
+            _unAvailableSeats.Remove(seat);
+            _availableSeats.Add(seat);
         }
+        #endregion
+
         public bool IsAvailable()
         {
             return _availableSeats.Count > 0;
-        }
-
-        public Transform GetSeatForCustomer(Customer customer)
-        {
-            if (IsAvailable() == false) return null;
-            Transform seat = _availableSeats[Random.Range(0, _availableSeats.Count - 1)];
-            _availableSeats.Remove(seat);
-            _unAvailableSeatDic.Add(customer, seat);
-            return seat;
         }
     }
 

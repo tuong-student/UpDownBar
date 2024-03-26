@@ -21,10 +21,12 @@ namespace Game
         [Header("In game menu")]
         [SerializeField] private GameObject _ingameMenu;
         [SerializeField] private TextMeshProUGUI _moneyText;
+        [SerializeField] private TextMeshProUGUI _tipText;
         [SerializeField] private TextMeshProUGUI _timeText;
         [SerializeField] private Image _timeBG;
         [SerializeField] private TextMeshProUGUI _dayText;
         [SerializeField] private CustomButton _pauseGameBtn;
+        [SerializeField] private ReputationSlider _reputationSlider;
         private Color _timeOriginalColor;
 
         [Header("End day menu")]
@@ -116,7 +118,8 @@ namespace Game
         }
         public void UpdateMoney()
         {
-            _moneyText.text = MoneyManager.Instance.GetMoney().ToString();
+            _moneyText.text = "+" + MoneyManager.Instance.GetMoney().ToString();
+            _tipText.text = "+" + MoneyManager.Instance.GetTip().ToString();
         }
         public void UpdateTime()
         {

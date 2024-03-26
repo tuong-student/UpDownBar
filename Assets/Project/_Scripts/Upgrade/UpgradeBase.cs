@@ -7,8 +7,8 @@ namespace Game
     public abstract class UpgradeBase : MonoBehaviour
     {
         #region Variable
-        public int Price = 100;
-        public float PriceMultipler = 1.5f;
+        [HideInInspector] public int Price = 100;
+        public float PriceMultipler = 200f;
     
         [SerializeField] protected UpgradeUI _upgradeUI;
         [SerializeField] protected UpgradeAction _upgradeAction;

@@ -25,9 +25,10 @@ namespace Game
         [SerializeField] private float _waitLossSpeed = 1f;
 
         private float _waitTimer = 0;
+        private float _waitingIntensity = 1;
         private bool _isWaiting;
 
-        [SerializeField] private int _money = 5;
+        [SerializeField] private int _money = 10;
         private Vector3 _targetSeat;
         private float _speed = 4f;
         private float _rotateSpeed = 10;
@@ -111,7 +112,8 @@ namespace Game
             if(_isWaiting)
             {
                 _waitTimer += TimeManager.DeltaTime * _waitLossSpeed;
-                _waitingUI.UpdateWaitingUI(_waitTimer / _maxWaitingTime);        
+                _waitingIntensity = _waitTimer / _maxWaitingTime;
+                _waitingUI.UpdateWaitingUI(_waitingIntensity);        
             }
             if(_waitTimer >= _maxWaitingTime)
             {
@@ -132,9 +134,18 @@ namespace Game
         {
             Return();
             // Pay money
-            TextPopup.Show("+" + _money, this.transform.position, Color.yellow);
+            TextPopup.Show("+" + _money, this.transform.position, Color.yellow); // Show money at this customer position
             MoneyManager.Instance.AddMoney(_money);
-            BeerServeManager.Instance.OnServeComplete?.Invoke(this);
+
+            // Prepare tip if customer feel good
+            int tip = 0;
+            if(_waitingIntensity > 0.5f)
+            {
+                tip = (int)(_waitingIntensity * 10);
+            }
+            MoneyManager.Instance.AddTipMoney(tip);
+
+            SoundManager.PlaySound(SoundEnum.ServeComplete, this.transform.position);
             _isWaiting = false;
         }
         private void Return()

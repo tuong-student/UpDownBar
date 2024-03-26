@@ -81,7 +81,7 @@ namespace NOOD.Data
             if (PlayerPrefs.HasKey(keyName))
             {
                 jsonStr = PlayerPrefs.GetString(keyName);
-                Debug.Log("Load success: " + jsonStr);
+                Debug.Log("Load Data From Player Pref success: " + jsonStr);
                 return JsonConvert.DeserializeObject<T>(jsonStr);
             }
             else
@@ -153,7 +153,7 @@ namespace NOOD.Data
         public static void SaveToPlayerPrefWithGenId(T data, string Id)
         {
             string jsonStr = JsonConvert.SerializeObject(data, Formatting.Indented);
-            Debug.Log(jsonStr);
+            Debug.Log("Save To Player Pref With Gen Id: " + jsonStr);
             PlayerPrefs.SetString(typeof(T).Name + Id, jsonStr);
             PlayerPrefs.Save();
         }

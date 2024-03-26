@@ -37,7 +37,6 @@ namespace Game
 
         private void OnServerFailHandler(Vector3 failPosition)
         {
-            Debug.Log("Remove money " + _moneyLostOnFail);
             MoneyManager.Instance.RemoveMoney(_moneyLostOnFail);
             TextPopup.Show("-" + _moneyLostOnFail, failPosition, Color.red);
             SoundManager.PlaySound(SoundEnum.ServeFail, failPosition);

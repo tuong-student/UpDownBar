@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NOOD;
 
@@ -5,6 +6,7 @@ namespace Game
 {
     public class UpgradeManager : MonoBehaviorInstance<UpgradeManager>
     {
+        private const string DO_NOT_ENOUGH_MONEY_ID = "DontHaveEnoughMoney";
         private List<UpgradeBase> _upgradeBaseList = new List<UpgradeBase>();
 
         protected override void ChildAwake()
@@ -30,8 +32,7 @@ namespace Game
             }
             else
             {
-                NotifyManager.Instance.Show("Do not enough money");
-                // Debug.Log("Do not enough money");
+                NotifyManager.Instance.Show(DO_NOT_ENOUGH_MONEY_ID.GetText());
             }
         }
     }

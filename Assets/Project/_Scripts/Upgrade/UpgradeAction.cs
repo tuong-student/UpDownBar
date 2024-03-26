@@ -4,19 +4,29 @@ namespace Game
 {
     public class UpgradeAction
     {
-        public Action OnComplete;
+        #region Variables
+        private Action _onComplete;
         private Action _action;
+        #endregion
         
-        public UpgradeAction(Action action)
+        #region Constructor
+        public UpgradeAction(Action action, Action onComplete = null)
         {
-            _action = action;
+            this._action = action;
+            this._onComplete = onComplete;
         }
+        #endregion
 
+        #region Public functions
         public void Invoke()
         {
             _action?.Invoke();
-            OnComplete?.Invoke();
+            _onComplete?.Invoke();
         }
+        public void OnComplete(Action onComplete)
+        {
+            this._onComplete = onComplete;
+        }
+        #endregion
     }
-
 }

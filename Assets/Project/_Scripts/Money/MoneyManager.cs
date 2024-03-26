@@ -15,7 +15,7 @@ namespace Game
         }
 
         public int GetMoney() => _money;
-        public bool PayMoney(int amount)
+        public bool TryPayMoney(int amount)
         {
             if (_money >= amount)
             {

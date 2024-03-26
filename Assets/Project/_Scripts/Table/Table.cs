@@ -14,7 +14,7 @@ namespace Game
 
         public int AvailableSeatNumber = 1;
 
-        private Stack<Transform> _lockSeatList = new Stack<Transform>();
+        private Stack<Transform> _lockSeatStack = new Stack<Transform>();
         private bool _unlockAllSeats;
         #endregion
 
@@ -27,11 +27,12 @@ namespace Game
         {
             while(_availableSeats.Count > AvailableSeatNumber && _unlockAllSeats == false)
             {
-                // Deactivate all seats but 1
+                // Deactivate all seats that not be unlocked
                 Transform seat = _availableSeats.Last();
                 seat.gameObject.SetActive(false);
-                _lockSeatList.Push(seat);
+                _lockSeatStack.Push(seat);
                 _availableSeats.Remove(seat);
+                Debug.Log($"Start {this.gameObject.name}: " + _lockSeatStack.Count);
             }
         }
         private void OnDestroy()
@@ -45,7 +46,8 @@ namespace Game
         #region Upgrade Functions    
         public Vector3 GetUpgradePosition()
         {
-            return _lockSeatList.ToArray()[0].position.ToVector3XZ();
+            Debug.Log("lock seat: " + _lockSeatStack.Count);
+            return _lockSeatStack.ToArray()[0].position.ToVector3XZ();
         }
         #endregion
 
@@ -82,7 +84,7 @@ namespace Game
         }
         public void UnlockSeat()
         {
-            Transform seat = _lockSeatList.Pop();
+            Transform seat = _lockSeatStack.Pop();
             seat.gameObject.SetActive(true);
             _availableSeats.Add(seat);
             TableManager.Instance.OnTableUpgrade?.Invoke(this);

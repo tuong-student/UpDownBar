@@ -6,56 +6,37 @@ namespace Game
 {
     public abstract class UpgradeBase : MonoBehaviour
     {
+        #region Variable
         public int Price = 100;
         public float PriceMultipler = 1.5f;
     
         [SerializeField] protected UpgradeUI _upgradeUI;
         [SerializeField] protected UpgradeAction _upgradeAction;
         protected int _upgradeTime = 1;
+        #endregion
 
         #region Unity functions
         protected void Awake()
         {
-            _upgradeUI.SetParent(this);
+            _upgradeUI.SetUpgradeBase(this);
             HideUI();
             ChildAwake();
         }
-        protected virtual void ChildAwake(){}
         protected void OnEnable()
         {
-            _upgradeUI.OnUpgradeButtonClick += OnUpgradeButtonClickHandler;
-            if(GameplayManager.Instance)
-            {
-                GameplayManager.Instance.OnNextDay += HideUI;
-            }
-            if(UIManager.Instance)
-            {
-                UIManager.Instance.OnStorePhrase += OnStorePhraseHandler;
-                UIManager.Instance.OnStorePhrase += OnStorePhaseHandler;
-            }
+            UpgradeManager.Instance.AddUpgradeBase(this);
             ChildOnEnable();
         }
         protected void Start()
         {
-            if(GameplayManager.Instance)
-            {
-                GameplayManager.Instance.OnNextDay += HideUI;
-            }
-            if(UIManager.Instance)
-            {
-                UIManager.Instance.OnStorePhrase += OnStorePhraseHandler;
-                UIManager.Instance.OnStorePhrase += OnStorePhaseHandler;
-            }
             ChildStart();
         }
-        protected virtual void ChildStart(){}
         protected void OnDisable()
         {
-            _upgradeUI.OnUpgradeButtonClick -= OnUpgradeButtonClickHandler;
-            NoodyCustomCode.UnSubscribeAllEvent<GameplayManager>(this);
-            NoodyCustomCode.UnSubscribeAllEvent<UIManager>(this);
             ChildOnDisable();
         }
+        protected virtual void ChildAwake(){}
+        protected virtual void ChildStart(){}
         protected virtual void ChildOnDisable(){}
         protected virtual void ChildOnEnable(){}
         #endregion
@@ -63,25 +44,21 @@ namespace Game
         #region Abstract functions
         protected abstract void Save();
         protected abstract void Load();
-        protected abstract string GetId();
+        protected abstract string GetSaveId();
         protected abstract bool CheckAllUpgradeComplete();
         /// <summary>
         /// This function is inherited by child to b/c it is set by child
         /// </summary>
         protected abstract void UpdateUpgradeTime();
+        protected abstract void UpgradeComplete();
         #endregion
 
-        private void OnUpgradeButtonClickHandler()
+        #region Virtual functions
+        public virtual void PerformUpgrade()
         {
-            UpgradeManager.Instance.Upgrade(this);
+            if(!CheckAllUpgradeComplete())
+                _upgradeAction.Invoke();
         }
-
-        protected virtual void OnStorePhaseHandler(){}
-        public void Upgrade()
-        {
-            _upgradeAction.Invoke();
-        }
-
         /// <summary>
         /// Update price base on own setting of the child upgradeTime
         /// </summary>
@@ -91,22 +68,34 @@ namespace Game
             Price = (int) (_upgradeTime * PriceMultipler) + 50;
             Save();
         }
+        #endregion
 
-        public void OnStorePhraseHandler()
+        #region Support
+        public bool IsUpgradeComplete()
         {
-            if(CheckAllUpgradeComplete() == false)
-                ShowUI();
+            return CheckAllUpgradeComplete();
         }
+        #endregion
 
-        public void HideUI()
+        #region Show Hide UI
+        public virtual void HideUI()
         {
             _upgradeUI.gameObject.SetActive(false);
         }
-        private void ShowUI()
+        public virtual void ShowUI()
         {
             UpdatePrice();
             _upgradeUI.gameObject.SetActive(true);
             _upgradeUI.UpdateMoneyText();
         }
+        #endregion
     }
 }
+
+
+
+
+
+
+
+

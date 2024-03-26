@@ -13,8 +13,6 @@ namespace Game
         public static Action OnPlayerChangePositionSuccess;
         public static Action OnPlayerPressDeliverBeer;
         private int _index = 0;
-        private bool _isServePressed;
-        private bool _isPausePressed;
 
         private void Update()
         {

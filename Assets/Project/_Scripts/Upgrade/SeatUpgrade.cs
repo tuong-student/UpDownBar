@@ -5,8 +5,11 @@ namespace Game
 {
     public class SeatUpgrade : UpgradeBase
     {
+        #region Variables
         private Table _table;
+        #endregion
 
+        #region Unity Functions
         protected override void ChildAwake()
         {
             _table = this.GetComponent<Table>();
@@ -14,24 +17,39 @@ namespace Game
             {
                 _table.UnlockSeat();
                 _table.AvailableSeatNumber++;
-            });
+            }, UpgradeComplete);
+        }
+        protected override void ChildOnEnable()
+        {
+            base.ChildOnEnable();
         }
         protected override void ChildStart()
         {
             Load();
         }
-        protected override void ChildOnEnable()
-        {
-            base.ChildOnEnable();
-            _upgradeAction.OnComplete += OnUpgradeCompleteHandler;
-        }
         protected override void ChildOnDisable()
         {
             base.ChildOnDisable();
-            _upgradeAction.OnComplete -= OnUpgradeCompleteHandler;
+        }
+        #endregion
+
+        #region Support
+        private void MoveToNewPos()
+        {
+            Vector3 tempPos = _table.GetUpgradePosition();
+            Vector3 newPos = new Vector3(tempPos.x, this.transform.position.y, tempPos.z);
+            _upgradeUI.SetPosition(newPos);
+        }
+        #endregion
+
+        public override void ShowUI()
+        {
+            base.ShowUI();
+            MoveToNewPos();
         }
 
-        public void OnUpgradeCompleteHandler()
+        #region Abstract functions override
+        protected override void UpgradeComplete()
         {
             if(CheckAllUpgradeComplete())
             {
@@ -42,12 +60,6 @@ namespace Game
                 MoveToNewPos();
             }
         }
-        private void MoveToNewPos()
-        {
-            Vector3 tempPos = _table.GetUpgradePosition();
-            Vector3 newPos = new Vector3(tempPos.x, this.transform.position.y, tempPos.z);
-            _upgradeUI.SetPosition(newPos);
-        }
         protected override bool CheckAllUpgradeComplete()
         {
             if (_table.AvailableSeatNumber == 4)
@@ -56,28 +68,22 @@ namespace Game
             }
             else return false;
         }
-        protected override void OnStorePhaseHandler()
-        {
-            OnUpgradeCompleteHandler();
-        }
-
-        #region Abstract functions override
         protected override void UpdateUpgradeTime()
         {
             _upgradeTime = _table.AvailableSeatNumber;
         }
-        protected override string GetId()
+        protected override string GetSaveId()
         {
             string Id = typeof(SeatUpgrade).ToString() + TableManager.Instance.GetTableList().IndexOf(_table);
             return Id;
         }
         protected override void Save()
         {
-            DataManager<int>.SaveToPlayerPrefWithGenId(_upgradeTime, GetId());
+            DataManager<int>.SaveToPlayerPrefWithGenId(_upgradeTime, GetSaveId());
         }
         protected override void Load()
         {
-            _upgradeTime = DataManager<int>.LoadDataFromPlayerPref(GetId(), 1);
+            _upgradeTime = DataManager<int>.LoadDataFromPlayerPref(keyName: GetSaveId(), defaultValue: 1);
         }
         #endregion
     }

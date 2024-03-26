@@ -9,16 +9,16 @@ namespace Game
     {
         public float GetVerticalInput()
         {
-            float y = 0;
+            float verticalInput = 0;
             if(Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
             {
-                y = 1;
+                verticalInput = 1;
             }
             if(Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
             {
-                y = -1;
+                verticalInput = -1;
             }
-            return y;
+            return verticalInput;
         }
         public bool IsPlayerPressServe()
         {
